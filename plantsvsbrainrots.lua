@@ -3769,5 +3769,82 @@ end
 -- Экспортируем функцию в глобальную область для удобства
 getgenv().updateAutoPetConfig = updateConfig
 
+-- ==================== AUTO TUTORIAL SYSTEM ====================
+
+local function autoTutorial()
+    print("\n" .. string.rep("=", 60))
+    print("🎓 AUTO TUTORIAL - SKIP SYSTEM")
+    print(string.rep("=", 60))
+    
+    local finishTutorialRemote = ReplicatedStorage.Remotes:FindFirstChild("FinishTutorial")
+    local spawnBrainrotRemote = ReplicatedStorage.Remotes:FindFirstChild("SpawnTutorialBrainrot")
+    local mainTutorial = PlayerGui.Main:FindFirstChild("Tutorial")
+    local hudTutorial = PlayerGui.HUD:FindFirstChild("Tutorial")
+    
+    print("\n🔍 Tutorial Components:")
+    if finishTutorialRemote then print("✅ FinishTutorial Remote") else print("❌ FinishTutorial Remote") end
+    if spawnBrainrotRemote then print("✅ SpawnTutorialBrainrot Remote") else print("❌ SpawnTutorialBrainrot Remote") end
+    if mainTutorial then print("✅ Main Tutorial UI") else print("❌ Main Tutorial UI") end
+    if hudTutorial then print("✅ HUD Tutorial UI") else print("❌ HUD Tutorial UI") end
+    
+
+    
+    
+    -- ส่ง Remote เพื่อจบ Tutorial ทันที
+    if finishTutorialRemote then
+        print("\n🚀 Sending finish tutorial commands...")
+        pcall(function()
+            finishTutorialRemote:FireServer()
+            finishTutorialRemote:FireServer(true)
+            finishTutorialRemote:FireServer("complete")
+            finishTutorialRemote:FireServer(LocalPlayer)
+            print("✅ Tutorial finish commands sent!")
+        end)
+    end
+    
+    -- ซ่อน Tutorial UI ถ้ามี
+    if mainTutorial then
+        pcall(function()
+            mainTutorial.Visible = false
+            print("✅ Main Tutorial UI hidden")
+        end)
+    end
+    
+    if hudTutorial then
+        pcall(function()
+            hudTutorial.Visible = false
+            print("✅ HUD Tutorial UI hidden")
+        end)
+    end
+    
+    print("\n🎉 Tutorial skip completed!")
+    print(string.rep("=", 60))
+end
+
+-- ตรวจสอบว่าต้องทำ Tutorial หรือไม่
+local function checkAndRunTutorial()
+    local needTutorial = false
+    
+    -- ตรวจสอบว่ามี Tutorial UI หรือไม่
+    local mainTutorial = PlayerGui.Main:FindFirstChild("Tutorial")
+    local hudTutorial = PlayerGui.HUD:FindFirstChild("Tutorial")
+    
+    if (mainTutorial and mainTutorial.Visible) or (hudTutorial and hudTutorial.Visible) then
+        needTutorial = true
+    end
+    
+    if needTutorial then
+        print("👶 Tutorial detected! Skipping tutorial...")
+        autoTutorial()
+        wait(2)
+        print("✅ Tutorial skipped! Starting main script...")
+    else
+        print("👨‍💼 No tutorial UI found, starting main script...")
+    end
+end
+
+-- ==================== MAIN EXECUTION ====================
+checkAndRunTutorial()
+
 -- Запуск скрипта
 main()
